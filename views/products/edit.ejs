@@ -7,7 +7,7 @@
 </head>
 <body>
  <h1>Edit A Products</h1>
- <form action="/products/<%= product._id %>/edit" method="post">
+ <form action="/products/<%= product._id %>?_method=PUT" method="post">
   <label for="name">Nama Produk</label>
   <input type="text" name="name" id="name" value="<%= product.name %>">
   <label for="brand">Brand</label>
