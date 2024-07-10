@@ -21,6 +21,11 @@ app.get('/', (req, res) => {
  res.send('Hello Ian')
 });
 
+app.get('/products', async (req, res) => {
+ const products = await Product.find({});
+ res.render('products/index', {products});
+});
+
 app.listen(port, () => {
  console.log('Shop app listening on port http://127.0.0.1:8989');
 })
