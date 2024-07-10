@@ -1,8 +1,11 @@
 const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
+// Models
+const Product = require('./models/product');
 const app = express();
 const port = 8989;
+
 
 // connect to mongodb
 mongoose.connect('mongodb://127.0.0.1/shop_db').then((result) => {
