@@ -21,6 +21,12 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true}));
 app.use(methodOverride('_method'));
 
+function wrapAsync(fn){
+ return function(req, res, next) {
+  fn(req, res, next).catch(err => next(err))
+ }
+}
+
 app.get('/', (req, res) => {
  res.send('Hello Ian')
 });
@@ -40,51 +46,35 @@ app.get('/products/create', (req, res) => {
  res.render('products/create');
 });
 
-app.post('/products', async (req, res) => {
+app.post('/products', wrapAsync(async (req, res) => {
  const product = new Product(req.body);
  await product.save();
  res.redirect(`/products/${product._id}`);
-})
+}));
 
-app.get('/products/:id', async (req, res, next) => {
- try {
+app.get('/products/:id', wrapAsync(async (req, res) => {
   const {id} = req.params;
   const product = await Product.findById(id);
   res.render('products/show', {product});
- } catch (error) {
-  next(new ErrorHandler('Product not found', 404));
- }
-});
+}));
 
-app.get('/products/:id/edit', async (req, res, next) => {
- try {
+app.get('/products/:id/edit', wrapAsync(async (req, res) => {
   const {id} = req.params;
   const product = await Product.findById(id);
   res.render('products/edit', {product});
- } catch (error) {
-  next(new ErrorHandler('Product not found', 404));
- }
-});
+}));
 
-app.put('/products/:id', async (req, res, next) => {
- try {
+app.put('/products/:id', wrapAsync(async (req, res) => {
   const {id} = req.params;
   const product = await Product.findByIdAndUpdate(id, req.body, {runValidators: true });
   res.redirect(`/products/${product._id}`);
- } catch (error) {
-  next(new ErrorHandler('Gagal update data', 412));
- }
-});
+}));
 
-app.delete('/products/:id', async (req, res, next) => {
- try {
+app.delete('/products/:id', wrapAsync(async (req, res) => {
   const {id} = req.params;
   await Product.findByIdAndDelete(id);
   res.redirect('/products');
- } catch (error) {
-  next(new ErrorHandler('Gagal delete data', 412));
- }
-})
+}));
 
 app.use((err, req, res, next) => {
  const { status = 500, message = 'Something Went Wrong' } = err;
